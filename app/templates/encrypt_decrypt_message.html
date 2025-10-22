@@ -1,9 +1,10 @@
 {% extends "index.html" %}
 {% block body_content %}
-<div class="container">
+<div class="col-12 container">
     <!-- versturen -->
-    <form id="sendForm" class="send_form">
-        <div class="col-12">
+    <div class="col-6">
+        <form id="sendForm" class="send_form">
+
             <div class="user_select">
                 <label for="users">Kies een user (afzender):</label>
                 <select id="users" name="user_id">
@@ -21,7 +22,6 @@
                     {% endfor %}
                 </select>
             </div>
-        </div>
 
         <div class="message_input">
             <label for="message">Bericht:</label>
@@ -29,35 +29,29 @@
         </div>
 
         <button type="submit" id="submit_send_button">Verstuur</button>
-    </form>
+        </form>
+        <div class="response" style="font-size:14px"></div>
+    </div>
 
-    <div id="response"></div>
+
+
+    <!-- ophalen van bericht -->
+    <div class="col-6">
+        <form id="retrieveForm" class="send_form">
+            <p>Encrypted bericht:</p>
+            <div class="response" style="font-size:14px"></div>
+            <button type="submit" id="retrieve_button">decrypt</button>
+        </form>
+
+        <div id="retrieved_messages"></div>
+    </div>
 </div>
-
-<hr>
-<!-- ophalen van bericht -->
-<div class="container">
-    <form id="retrieveForm" class="send_form">
-        <div class="user_select">
-            <label for="ophalen">Kies een user om berichten op te halen:</label>
-            <select id="ophalen" name="receiver_id">
-                {% for user in users %}
-                <option value="{{ user.id }}">{{ user.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" id="retrieve_button">Ophalen</button>
-    </form>
-
-    <div id="retrieved_messages"></div>
-</div>
-
 <script>
 <!--    javascript voor ophalen van en versturen van bericht-->
 
 document.getElementById('sendForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const responseEl = document.getElementById('response');
+  const responseEl = document.getElementsByClassName('response');
   const formData = new FormData(e.target);
   const data = Object.fromEntries(formData.entries());
 
@@ -67,9 +61,10 @@ document.getElementById('sendForm').addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-
     const result = await res.json();
-    responseEl.textContent = result.message || "Bericht verzonden!";
+    [...responseEl].forEach(e => {
+      e.textContent = result.message || "Bericht verzonden!";
+    });
   } catch (err) {
     responseEl.textContent = "Fout bij verzenden van bericht.";
   }

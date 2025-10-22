@@ -5,9 +5,10 @@ body {
   margin: 0;
   padding: 2rem;
 }
-
-.container {
-  max-width: 600px;
+.col-12 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   margin: auto;
   background: white;
   border-radius: 10px;
