@@ -1,5 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, blueprints
+from controllers.send_message import send_message_bp
 app = Flask(__name__, static_folder='static/', template_folder='templates/')
+
+app.register_blueprint(send_message_bp)
+
 @app.route('/')
 def main():
     users = [

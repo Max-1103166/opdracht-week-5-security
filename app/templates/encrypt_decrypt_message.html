@@ -54,5 +54,25 @@
 
 <script>
 <!--    javascript voor ophalen van en versturen van bericht-->
+
+document.getElementById('sendForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const responseEl = document.getElementById('response');
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch('/api/send_message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    responseEl.textContent = result.message || "Bericht verzonden!";
+  } catch (err) {
+    responseEl.textContent = "Fout bij verzenden van bericht.";
+  }
+});
 </script>
 {% endblock %}
