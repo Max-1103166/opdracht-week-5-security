@@ -8,29 +8,35 @@
             <div class="user_select">
                 <label for="users">Kies een user (afzender):</label>
                 <select id="users" name="user_id">
-                    {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.name }}</option>
-                    {% endfor %}
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }}</option>
+                {% endfor %}
                 </select>
             </div>
 
             <div class="user_select">
                 <label for="receiver">Kies een ontvanger:</label>
                 <select id="receiver" name="receiver_id">
-                    {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.name }}</option>
-                    {% endfor %}
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }}</option>
+                {% endfor %}
                 </select>
             </div>
 
-        <div class="message_input">
-            <label for="message">Bericht:</label>
-            <input type="text" name="message" placeholder="Type je bericht" id="message" required>
-        </div>
+            <div class="message_input">
+                <label for="message">Bericht:</label>
+                <input type="text" name="message" placeholder="Type je bericht" id="message" required>
+            </div>
 
-        <button type="submit" id="submit_send_button">Verstuur</button>
+            <button type="submit" id="submit_send_button">Verstuur</button>
         </form>
-        <div class="response" style="font-size:14px"></div>
+        <div class="response" >
+                <p>encrypted message</p>
+                <div class="message" style="font-size:14px;"></div>
+                <hr>
+                <p>salt</p>
+                <div class="salt" style="font-size:14px"></div>
+        </div>
     </div>
 
 
@@ -38,36 +44,72 @@
     <!-- ophalen van bericht -->
     <div class="col-6">
         <form id="retrieveForm" class="send_form">
+            <div class="user_select">
+                <label for="current_user">Kies een ontvanger:</label>
+                <select id="current_user" name="receiver_id">
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }}</option>
+                {% endfor %}
+                </select>
+            </div>
             <p>Encrypted bericht:</p>
-            <div class="response" style="font-size:14px"></div>
+            <div class="response" >
+                    <p>encrypted message</p>
+                    <div class="message" style="font-size:14px;"></div>
+                    <hr>
+                    <p>salt</p>
+                    <div class="salt" style="font-size:14px"></div>
+            </div>
             <button type="submit" id="retrieve_button">decrypt</button>
         </form>
 
-        <div id="retrieved_messages"></div>
+        <div id="decrypted_message"></div>
     </div>
 </div>
 <script>
 <!--    javascript voor ophalen van en versturen van bericht-->
 
 document.getElementById('sendForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const responseEl = document.getElementsByClassName('response');
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData.entries());
+    e.preventDefault();
+    const responseEl = document.getElementsByClassName('response');
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
 
-  try {
-    const res = await fetch('/api/send_message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    const result = await res.json();
-    [...responseEl].forEach(e => {
-      e.textContent = result.message || "Bericht verzonden!";
-    });
-  } catch (err) {
-    responseEl.textContent = "Fout bij verzenden van bericht.";
-  }
+    try {
+        const res = await fetch('/api/send_message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        [...responseEl].forEach(e => {
+            console.log(e.querySelector('.message'))
+            e.querySelector('.message').textContent = result.messages['message'];
+            e.querySelector('.salt').textContent = result.messages['salt'];
+
+        });
+    } catch (err) {
+        responseEl.textContent = "Fout bij verzenden van bericht.";
+    }
+});
+
+document.getElementById('retrieveForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const responseEl = document.getElementsByClassName('decrypted_message');
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    console.log('test');
+    try {
+        const res = await fetch('/api/retrieve_message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        responseEl.textContent = result.messages;
+    } catch (err) {
+        responseEl.textContent = "Fout bij ophalen van bericht.";
+    }
 });
 </script>
 {% endblock %}

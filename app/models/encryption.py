@@ -22,5 +22,9 @@ class Encryption:
         key = base64.urlsafe_b64encode(kdf.derive(receiver_password.encode()))
         fernet = Fernet(key)
         message = fernet.encrypt(message.encode())
+        salt = base64.urlsafe_b64encode(salt)
+        return {'message': message.decode(), 'salt': salt.decode()}
 
-        return message.decode()
+    def decrypt(self, receiver_id):
+        print("test", receiver_id)
+        return {'message': receiver_id}
