@@ -2,8 +2,8 @@
 {% block body_content %}
 <div class="col-12 container">
     <!-- versturen -->
-    <div class="col-6">
-        <form id="sendForm" class="send_form">
+    <div class="col-12">
+        <form id="sendForm" class="send_form col-6">
 
             <div class="user_select">
                 <label for="users">Kies een user (afzender):</label>
@@ -30,20 +30,17 @@
 
             <button type="submit" id="submit_send_button">Verstuur</button>
         </form>
-        <div class="response" >
-                <p>encrypted message</p>
-                <div class="message" style="font-size:14px;"></div>
-                <hr>
-                <p>salt</p>
-                <div class="salt" style="font-size:14px"></div>
+
+
+        <div class="response col-6" >
+            <p>Encrypted bericht:</p>
+            <div class="message" style="font-size:10px; word-wrap: break-word;"></div>
         </div>
     </div>
 
-
-
     <!-- ophalen van bericht -->
-    <div class="col-6">
-        <form id="retrieveForm" class="send_form">
+    <div class="col-12">
+        <form id="retrieveForm" class="send_form col-6">
             <div class="user_select">
                 <label for="current_user">Kies een ontvanger:</label>
                 <select id="current_user" name="receiver_id">
@@ -54,16 +51,16 @@
             </div>
             <p>Encrypted bericht:</p>
             <div class="response" >
-                    <p>encrypted message</p>
-                    <div class="message" style="font-size:14px;"></div>
-                    <hr>
-                    <p>salt</p>
-                    <div class="salt" style="font-size:14px"></div>
+                <div class="message" style="font-size:10px; word-wrap: break-word;"></div>
             </div>
             <button type="submit" id="retrieve_button">decrypt</button>
         </form>
+        <div class="col-6">
+            <p>Decrypted bericht:</p>
+            <div id="decrypted_message">
 
-        <div id="decrypted_message"></div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -85,8 +82,6 @@ document.getElementById('sendForm').addEventListener('submit', async (e) => {
         [...responseEl].forEach(e => {
             console.log(e.querySelector('.message'))
             e.querySelector('.message').textContent = result.messages['message'];
-            e.querySelector('.salt').textContent = result.messages['salt'];
-
         });
     } catch (err) {
         responseEl.textContent = "Fout bij verzenden van bericht.";
@@ -95,10 +90,9 @@ document.getElementById('sendForm').addEventListener('submit', async (e) => {
 
 document.getElementById('retrieveForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const responseEl = document.getElementsByClassName('decrypted_message');
+    const responseEl = document.getElementById('decrypted_message');
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
-    console.log('test');
     try {
         const res = await fetch('/api/retrieve_message', {
         method: 'POST',
@@ -106,7 +100,8 @@ document.getElementById('retrieveForm').addEventListener('submit', async (e) => 
         body: JSON.stringify(data)
         });
         const result = await res.json();
-        responseEl.textContent = result.messages;
+        console.log(result)
+        responseEl.textContent = result.messages['message'];
     } catch (err) {
         responseEl.textContent = "Fout bij ophalen van bericht.";
     }
