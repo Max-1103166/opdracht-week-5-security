@@ -3,10 +3,13 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
+import requests
 
 class Encryption:
     def __init__(self):
-        pass
+        database = Database('./databases/database.db')
+        self.hsm_url = "http://localhost:5000/hsm/get_key"
+        self.cursor, self.con = database.connect_db()
 
     def encrypt(self, user_id, message, receiver_id):
         receiver_password = "dit is een geheim wachtwoord"
