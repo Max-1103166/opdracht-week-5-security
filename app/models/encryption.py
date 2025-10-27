@@ -16,7 +16,6 @@ class Encryption:
         return g.db
 
     def fetch_key(self, user_id:int, receiver_id:int,salt:bytes):
-
         salt_decoded = base64.urlsafe_b64encode(salt).decode()
         response = requests.post(self.hsm_get_key, json={
             "user_id": user_id,
@@ -25,8 +24,8 @@ class Encryption:
         })
         data = response.json()
 
-        # gebruik een kdf
         kdf = KDF()
+        # hier wordt een sleutel van een kdf afgeleid
         key = kdf.derive_key(data['key'], salt)
 
         return key.decode()
@@ -43,20 +42,25 @@ class Encryption:
         # encrypt bericht met hsm_key + salt die door een kdf is gegaan
         message = fernet.encrypt(message.encode())
         db = self.get_db()
+        # hier wordt het bericht opgeslagen met salt
         query = "INSERT INTO messages (user_id, message, receiver_id,salt) VALUES (?, ?, ?, ?)"
         result = db.execute(query, (user_id, message, receiver_id, salt))
         db.commit()
         if result:
-            return {'message': message.decode()}
+            salt_decoded = base64.urlsafe_b64encode(salt).decode()
+            return {'message': message.decode(), 'salt': salt_decoded}
         else:
             return {'error': 'Failed to encrypt message'}
 
 
     def decrypt(self, receiver_id):
         db = self.get_db()
+        # bericht wordt opgehaalt met receiver_id
         query = "SELECT * FROM messages WHERE receiver_id=? ORDER BY id DESC LIMIT 1"
         result = db.execute(query, (receiver_id,)).fetchone()
+        # hier wordt de sleutel weer opgehaalt, met user_id, receiver_id en salt
         key = self.fetch_key(result[1], result[2], result[4])
         fernet = Fernet(key)
+        # bericht wordt hier gedecrypt
         message = fernet.decrypt(result[3])
         return {'message': message.decode()}

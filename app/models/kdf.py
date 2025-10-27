@@ -5,6 +5,7 @@ import base64
 
 class KDF:
     def derive_key(self,password: str, salt: bytes):
+        # hier wordt een kdf gebruik om de key uit de hsm te versleutelen met salt
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
