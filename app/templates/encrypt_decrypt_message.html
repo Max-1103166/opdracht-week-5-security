@@ -66,23 +66,31 @@
 <script>
 <!--    javascript voor ophalen van en versturen van bericht-->
 
+
 document.getElementById('sendForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const responseEl = document.getElementsByClassName('response');
+
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
 
+    [...responseEl].forEach(e => {
+            console.log(e.querySelector('.message'))
+            e.querySelector('.message').textContent = "aan het encrypten...";
+    });
     try {
         const res = await fetch('/api/send_message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
         });
+
         const result = await res.json();
         [...responseEl].forEach(e => {
             console.log(e.querySelector('.message'))
             e.querySelector('.message').textContent = result.messages['message'];
         });
+
     } catch (err) {
         responseEl.textContent = "Fout bij verzenden van bericht.";
     }
@@ -93,6 +101,8 @@ document.getElementById('retrieveForm').addEventListener('submit', async (e) => 
     const responseEl = document.getElementById('decrypted_message');
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
+
+    responseEl.textContent = "aan het decrypten...";
     try {
         const res = await fetch('/api/retrieve_message', {
         method: 'POST',

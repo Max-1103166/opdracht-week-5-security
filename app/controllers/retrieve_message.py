@@ -8,7 +8,10 @@ def retrieve_message():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Data not found"}), 404
-    receiver_id = request.json['receiver_id']
+
+    if data.get('receiver_id') is None:
+        return jsonify({'status': 'error', 'message': f'Missing {field}'}), 400
+    receiver_id = data['receiver_id']
 
     encryption = Encryption()
 

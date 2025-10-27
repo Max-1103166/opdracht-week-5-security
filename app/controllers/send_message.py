@@ -10,10 +10,14 @@ def send_message():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Data not found"}), 404
+    required_fields = ['user_id', 'message', 'receiver_id']
+    for field in required_fields:
+        if data.get(field) is None:
+            return jsonify({'status': 'error', 'message': f'Missing {field}'}), 400
 
-    user_id = request.json['user_id']
-    message = request.json['message']
-    receiver_id = request.json['receiver_id']
+    user_id = data['user_id']
+    message = data['message']
+    receiver_id = data['receiver_id']
     encryption = Encryption()
 
     result = encryption.encrypt(user_id,message,receiver_id)
