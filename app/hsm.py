@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
-import os
 import base64
-
+import secrets
 app = Flask(__name__)
 KEYS = {}
 
@@ -12,7 +11,7 @@ def get_key():
     salt = request.json.get("salt")
     # checkt of de key al bestaat, zo niet maakt hij deze key aan
     if (user_id , receiver_id, salt) not in KEYS:
-        KEYS[user_id , receiver_id, salt] = base64.urlsafe_b64encode(os.urandom(32)).decode()
+        KEYS[user_id , receiver_id, salt] = base64.urlsafe_b64encode(secrets.token_bytes(16)).decode()
     return jsonify({"key": KEYS[user_id , receiver_id, salt]})
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from flask import g
 import sqlite3
-import os
+import secrets
 import base64
 from models.kdf import KDF
 from cryptography.fernet import Fernet
@@ -32,7 +32,7 @@ class Encryption:
 
     def encrypt(self, user_id, message, receiver_id):
         # genereer salt
-        salt = os.urandom(16)
+        salt = secrets.token_bytes(16)
 
         # haal een key op uit de hsm met parameters
         key = self.fetch_key(user_id,receiver_id,salt)
